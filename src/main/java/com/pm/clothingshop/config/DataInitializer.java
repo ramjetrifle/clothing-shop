@@ -69,35 +69,35 @@ public class DataInitializer implements CommandLineRunner {
         Category shoes = categories.get(5);
         Category accessories = categories.get(6);
 
-        // tshirts
+        // T-Shirts
         allProducts.add(createProduct("Plain White T-Shirt", "Classic comfortable cotton t-shirt", 19.99,
                 Arrays.asList("XS", "S", "M", "L", "XL", "XXL"), tshirts, "/images/tshirts/white-tshirt.jpg", 100L));
         allProducts.add(createProduct("Plain Black T-Shirt", "Essential black cotton t-shirt", 19.99,
                 Arrays.asList("XS", "S", "M", "L", "XL", "XXL"), tshirts, "/images/tshirts/black-tshirt.jpg", 100L));
 
-        // shirts
+// Shirts
         allProducts.add(createProduct("White Dress Shirt", "Professional white dress shirt", 49.99,
                 Arrays.asList("S", "M", "L", "XL", "XXL"), shirts, "/images/shirts/white-shirt.jpg", 60L));
         allProducts.add(createProduct("Denim Shirt", "Casual denim button-up", 42.99,
                 Arrays.asList("S", "M", "L", "XL"), shirts, "/images/shirts/blue-denim-shirt.jpg", 40L));
 
-        // Pants
+// Pants
         allProducts.add(createProduct("Blue Jeans", "Classic blue denim jeans", 59.99,
                 Arrays.asList("28", "30", "32", "34", "36", "38"), pants, "/images/pants/blue-denim-jeans.jpg", 80L));
         allProducts.add(createProduct("Black Jeans", "Sleek black denim", 59.99,
                 Arrays.asList("28", "30", "32", "34", "36", "38"), pants, "/images/pants/black-jeans.jpg", 80L));
 
-        // Hoodies
+// Hoodies
         allProducts.add(createProduct("Black Hoodie", "Classic black pullover hoodie", 49.99,
                 Arrays.asList("S", "M", "L", "XL", "XXL"), hoodies, "/images/hoodies/black-hoodie.jpg", 60L));
         allProducts.add(createProduct("Gray Hoodie", "Comfortable gray hoodie", 49.99,
                 Arrays.asList("S", "M", "L", "XL", "XXL"), hoodies, "/images/hoodies/gray-hoodie.jpg", 60L));
 
-        // Jacket
+// Jackets
         allProducts.add(createProduct("Denim Jacket", "Classic blue denim jacket", 79.99,
                 Arrays.asList("S", "M", "L", "XL"), jackets, "/images/jackets/denim-jacket.jpg", 40L));
 
-        // Shoes
+// Shoes
         allProducts.add(createProduct("White Sneakers", "Clean white sneakers", 79.99,
                 Arrays.asList("7", "8", "9", "10", "11", "12"), shoes, "/images/shoes/white-sneakers.jpg", 50L));
         allProducts.add(createProduct("Black Sneakers", "Classic black sneakers", 79.99,
@@ -105,7 +105,7 @@ public class DataInitializer implements CommandLineRunner {
         allProducts.add(createProduct("Running Shoes", "Performance running shoes", 99.99,
                 Arrays.asList("7", "8", "9", "10", "11", "12"), shoes, "/images/shoes/running-shoes.jpg", 40L));
 
-        // Accessories
+// Accessories
         allProducts.add(createProduct("Baseball Cap", "Classic adjustable cap", 24.99,
                 Arrays.asList("One Size"), accessories, "/images/accessories/cap.jpg", 100L));
         allProducts.add(createProduct("Beanie", "Warm knit beanie", 19.99,
@@ -114,7 +114,6 @@ public class DataInitializer implements CommandLineRunner {
                 Arrays.asList("S", "M", "L", "XL"), accessories, "/images/accessories/black-belt.jpg", 60L));
         allProducts.add(createProduct("Sunglasses", "UV protection sunglasses", 39.99,
                 Arrays.asList("One Size"), accessories, "/images/accessories/black-sunglasses.jpg", 70L));
-
         productRepository.saveAll(allProducts);
         return allProducts.size();
     }

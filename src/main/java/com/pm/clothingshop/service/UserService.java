@@ -37,7 +37,7 @@ public class UserService {
         }
 
         if (userRepository.existsByUsername(userRegisterRequest.getUsername())) {
-            throw new DuplicateResourceException("User", "email", userRegisterRequest.getEmail());
+            throw new DuplicateResourceException("User", "username", userRegisterRequest.getUsername());
         }
 
         User user = new User();
@@ -62,7 +62,7 @@ public class UserService {
     }
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", email));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         return modelMapper.map(user, UserResponse.class);
     }
     public List<UserResponse> getAllUsers() {
@@ -72,14 +72,14 @@ public class UserService {
     }
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", email));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
     }
     public User getCurrentUser() {
         String email = SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UnauthorizedException("User not authonticated"));
+                .orElseThrow(() -> new UnauthorizedException("User not authenticated"));
     }
     public Long getCurrentUserId() {
         return getCurrentUser().getId();

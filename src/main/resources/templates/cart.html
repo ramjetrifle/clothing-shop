@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Clothing Shop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1">Clothing Shop</span>
+        <div>
+            <a href="/categories" class="btn btn-outline-light btn-sm me-2">Continue Shopping</a>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Your Cart</h2>
+
+    <div id="cartContainer">
+    </div>
+
+    <div id="emptyCart" class="text-center py-5 d-none">
+        <h4 class="text-muted">Your cart is empty</h4>
+        <a href="/categories" class="btn btn-primary mt-3">Start Shopping</a>
+    </div>
+
+    <div id="cartSummary" class="d-none">
+        <div class="card mt-4 shadow-sm">
+            <div class="card-body">
+                <h4>Order Summary</h4>
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Items:</span>
+                    <span id="totalItems">0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="fw-bold">Total Price:</span>
+                    <span class="fw-bold text-success" id="totalPrice">$0.00</span>
+                </div>
+                <button class="btn btn-success w-100 btn-lg" onclick="payNow()">PAY NOW</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    async function loadCart() {
+        try {
+            const response = await fetch('/api/cart', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const cart = await response.json();
+
+            if (cart.items.length === 0) {
+                document.getElementById('emptyCart').classList.remove('d-none');
+                document.getElementById('cartSummary').classList.add('d-none');
+                return;
+            }
+
+            displayCart(cart);
+        } catch (error) {
+            console.error('Error loading cart:', error);
+            alert('Failed to load cart');
+        }
+    }
+
+    function displayCart(cart) {
+        const container = document.getElementById('cartContainer');
+        container.innerHTML = '';
+
+        cart.items.forEach(item => {
+            const cartItem = `
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <img src="${item.productImage}" class="img-fluid rounded" alt="${item.productName}">
+                                </div>
+                                <div class="col-md-4">
+                                    <h5>${item.productName}</h5>
+                                    <p class="text-muted mb-0">Size: ${item.selectedSize}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="small">Quantity</label>
+                                    <input type="number" class="form-control" value="${item.quantity}" min="1"
+                                           onchange="updateQuantity(${item.id}, this.value)">
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <p class="mb-0 text-muted small">Price</p>
+                                    <p class="mb-0 fw-bold">$${item.pricePerItem.toFixed(2)}</p>
+                                    <p class="mb-0 text-success">Total: $${item.subTotal.toFixed(2)}</p>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <button class="btn btn-danger btn-sm" onclick="removeItem(${item.id})">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            container.innerHTML += cartItem;
+        });
+
+        document.getElementById('totalItems').textContent = cart.totalItems;
+        document.getElementById('totalPrice').textContent = '$' + cart.totalPrice.toFixed(2);
+        document.getElementById('cartSummary').classList.remove('d-none');
+        document.getElementById('emptyCart').classList.add('d-none');
+    }
+
+    async function updateQuantity(cartItemId, newQuantity) {
+        try {
+            const response = await fetch(`/api/cart/items/${cartItemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ quantity: parseInt(newQuantity) })
+            });
+
+            if (response.ok) {
+                loadCart();
+            } else {
+                alert('Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            alert('Failed to update quantity');
+        }
+    }
+
+    async function removeItem(cartItemId) {
+        if (!confirm('Remove this item from cart?')) return;
+
+        try {
+            const response = await fetch(`/api/cart/items/${cartItemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            if (response.ok) {
+                loadCart();
+            } else {
+                alert('Failed to remove item');
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+            alert('Failed to remove item');
+        }
+    }
+
+    async function payNow() {
+        if (!confirm('Proceed with payment?')) return;
+
+        try {
+            const response = await fetch('/api/cart/pay', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.message + '\nAmount Paid: ' + data.amount);
+                window.location.href = '/categories';
+            } else {
+                alert('Payment failed: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error processing payment:', error);
+            alert('Payment failed');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.location.href = '/login';
+    }
+
+    loadCart();
+</script>
+</body>
+</html>
